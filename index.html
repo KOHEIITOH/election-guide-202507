@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ参院選ガイド 2025 | アラサーのための投票ナビ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony (Light neutrals with a single subtle accent color) -->
+    <!-- Application Structure Plan: A tab-based single-page application structure was designed. This allows users to directly navigate to the content they are most interested in (e.g., 'Choose by Issue', 'How to Vote'), rather than scrolling through a long, linear document. This user-driven, non-linear approach is more engaging and efficient for a web application. The core interaction is the 'Choose by Issue' filter, which empowers users to compare parties based on their personal priorities, directly addressing the goal of helping them make an informed decision. -->
+    <!-- Visualization & Content Choices: Instead of charts for qualitative data, interactive cards are used. Report Info: Party stances on issues. -> Goal: Compare. -> Viz/Presentation Method: HTML/Tailwind styled cards. -> Interaction: Users click an issue button (e.g., 'Child-rearing') to filter and display only the relevant cards for each party. -> Justification: This method is more intuitive and digestible for comparing text-based policy points than a complex chart would be. It avoids misrepresenting qualitative stances as quantitative data and is highly responsive. The 'How to Vote' process is visualized using a styled HTML flexbox layout, which is clearer than plain text. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8f9fa; }
+        .tab-active { border-color: #3b82f6; color: #3b82f6; background-color: #eff6ff; }
+        .tab-inactive { border-color: transparent; color: #6b7280; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .issue-btn-active { background-color: #3b82f6; color: white; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .policy-card { display: none; }
+        .policy-card.visible { display: flex; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto max-w-5xl p-4 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">インタラクティブ参院選ガイド 2025</h1>
+            <p class="text-gray-600 mt-2 text-lg">アラサー世代のあなたのための、いちばん分かりやすい投票ナビ</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap justify-center border-b-2 border-gray-200 mb-8">
+            <button class="nav-tab tab-active text-lg font-semibold py-3 px-6 border-b-2 transition-colors duration-300" data-tab="home">🏠 はじめに</button>
+            <button class="nav-tab tab-inactive text-lg font-semibold py-3 px-6 border-b-2 transition-colors duration-300" data-tab="issues">🎯 争点で選ぶ</button>
+            <button class="nav-tab tab-inactive text-lg font-semibold py-3 px-6 border-b-2 transition-colors duration-300" data-tab="parties">👥 政党を知る</button>
+            <button class="nav-tab tab-inactive text-lg font-semibold py-3 px-6 border-b-2 transition-colors duration-300" data-tab="how-to-vote">🗳️ 投票のしかた</button>
+        </nav>
+
+        <!-- Content Area -->
+        <main>
+            <!-- Home Section -->
+            <section id="home" class="content-section active fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">7月20日の選挙、あなたの未来に関わる大切な一歩です。</h2>
+                    <p class="mb-4 text-base md:text-lg leading-relaxed">2025年7月20日(日)は、第27回参議院議員通常選挙の投票日。物価高、働き方、子育て、将来の年金...。私たちの生活に直結する課題が山積みの中、この選挙は今後の日本の方向性を決める重要な機会です。</p>
+                    <p class="mb-6 text-base md:text-lg leading-relaxed">特に、キャリアやライフプランの岐路に立つ私たちアラサー世代にとって、各党が示す政策は、未来の設計図そのもの。「政治は難しくて分からない」「自分の1票じゃ何も変わらない」と感じていませんか？このサイトは、そんなあなたのための羅針盤です。複雑な情報をシンプルに整理し、あなたが「これだ」と思える選択をするためのお手伝いをします。</p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg">
+                        <p class="font-bold">このアプリでできること</p>
+                        <ul class="list-disc list-inside mt-2">
+                            <li>気になる争点から、各党の考えをサクッと比較</li>
+                            <li>どんな政党があるのか、特徴をひと目で把握</li>
+                            <li>意外と知らない？投票の基本を分かりやすく解説</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Issues Section -->
+            <section id="issues" class="content-section fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-2 text-gray-700">争点で選ぶ</h2>
+                    <p class="mb-6 text-gray-600">あなたの関心事はどれですか？ボタンを押すと各党の公約が表示されます。</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                        <button class="issue-btn p-3 rounded-lg font-semibold transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" data-issue="economy">💰 給料と物価</button>
+                        <button class="issue-btn p-3 rounded-lg font-semibold transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" data-issue="work">⚖️ 働き方とキャリア</button>
+                        <button class="issue-btn p-3 rounded-lg font-semibold transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" data-issue="family">👨‍👩‍👧‍👦 子育てと教育</button>
+                        <button class="issue-btn p-3 rounded-lg font-semibold transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" data-issue="future">🏦 将来の安心</button>
+                    </div>
+
+                    <div id="policy-display-area" class="space-y-4">
+                        <div id="initial-message" class="text-center text-gray-500 p-8 border-2 border-dashed rounded-lg">
+                            <p>上のボタンから気になる争点を選んでください。</p>
+                        </div>
+                        <!-- Policies will be injected here by JS -->
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                            <div class="w-24 text-center font-bold mr-4 shrink-0">自民党</div>
+                            <div class="flex-1">
+                                <h4 class="font-bold mb-1">財政規律と的を絞った支援</h4>
+                                <p class="text-sm text-gray-700">大規模減税には慎重。ガソリン・電気代補助など、的を絞った物価高対策を継続。企業の賃上げを促す環境整備を重視。</p>
+                            </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">立憲民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">時限的な消費税減税</h4>
+                                <p class="text-sm text-gray-700">生活への影響が大きい食料品の消費税率を時限的に0%に。最低賃金1500円以上を目指す。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">日本維新の会</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">消費税減税＋社会保険料引き下げ</h4>
+                                <p class="text-sm text-gray-700">食料品の消費税率を時限的に0%に。さらに、現役世代の社会保険料引き下げで手取り増を目指す。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">公明党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">生活応援給付</h4>
+                                <p class="text-sm text-gray-700">減税と給付金を組み合わせた「生活応援給付」で、家計を直接支援。中小企業の賃上げを重点的にサポート。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">国民民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">手取りを増やす</h4>
+                                <p class="text-sm text-gray-700">「給料が上がる経済」を最優先。所得税減税や、消費税を時限的に5%へ引き下げることを主張。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">共産党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">消費税5%へ、将来は廃止</h4>
+                                <p class="text-sm text-gray-700">消費税率を緊急に5%へ引き下げ。財源は法人増税や富裕層への課税強化で確保する。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="economy">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">れいわ新選組</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">消費税廃止と現金給付</h4>
+                                <p class="text-sm text-gray-700">最も急進的。消費税の即時廃止と、インフレ手当としての現金給付を訴える。</p>
+                             </div>
+                        </div>
+
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="work">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">自民党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">企業努力を支援</h4>
+                                <p class="text-sm text-gray-700">仕事と健康課題の両立支援など、企業側の自主的な取り組みを「支援」する形での緩やかな変化を促す。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="work">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">立憲民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">同一価値労働同一賃金の法制化</h4>
+                                <p class="text-sm text-gray-700">職務内容が同価値であれば性別に関わらず同一賃金を支払うことを法律で義務付け、男女間の経済格差是正を目指す。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="work">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">日本維新の会</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">市場原理で改革</h4>
+                                <p class="text-sm text-gray-700">企業の女性雇用率や役員比率に応じて減税を行うなど、インセンティブと雇用の流動化で成長を促す。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="work">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">国民民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">「母の罰」の解消</h4>
+                                <p class="text-sm text-gray-700">出産・育児を機に女性の所得が減少する「母の罰」問題の解消を明確に掲げ、当事者にアピール。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="work">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">共産党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">労働者の権利を抜本強化</h4>
+                                <p class="text-sm text-gray-700">最低賃金の大幅な引き上げ（1500円）や、非正規雇用の原則禁止など、国の責任による改革を主張。</p>
+                             </div>
+                        </div>
+                        
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="family">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">自民党・公明党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">切れ目のない支援の実現</h4>
+                                <p class="text-sm text-gray-700">公明党が主導し、児童手当の抜本拡充や妊娠・出産期からの伴走型支援など、具体的な施策を着実に推進。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="family">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">立憲民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">給食無償化と「隠れ教育費」軽減</h4>
+                                <p class="text-sm text-gray-700">学校給食の無償化と質の担保、さらに修学旅行費や教材費といった家計を圧迫する費用の負担軽減を提案。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="family">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">日本維新の会</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">「子育ての無償化」</h4>
+                                <p class="text-sm text-gray-700">教育の無償化からさらに踏み込み、0-2歳児の保育料も含めた「子育ての無償化」という大胆な公約を掲げる。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="family">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">共産党・れいわ</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">大学院まで教育費無償化</h4>
+                                <p class="text-sm text-gray-700">高等教育を含めた教育費全体の無償化を主張。れいわは月額3万円の子ども手当も公約に盛り込む。</p>
+                             </div>
+                        </div>
+
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="future">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">自民党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">制度の持続可能性を最優先</h4>
+                                <p class="text-sm text-gray-700">医療DX（デジタル化）推進による効率化を強調。具体的な給付増よりも、将来にわたって制度を維持することに重きを置く。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="future">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">公明党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">セーフティネット強化</h4>
+                                <p class="text-sm text-gray-700">基礎年金の給付水準の底上げや、パート労働者などへの厚生年金の適用拡大で、支え合いの仕組みを強化。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="future">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">日本維新の会</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">現役世代の負担軽減を最優先</h4>
+                                <p class="text-sm text-gray-700">医療費の徹底的な効率化で財源を捻出し、現役世代の社会保険料を年間6万円引き下げるという大胆な提案。</p>
+                             </div>
+                        </div>
+                         <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="future">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">立憲民主党</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">きめ細やかな制度見直し</h4>
+                                <p class="text-sm text-gray-700">厚生年金の適用拡大や、高齢者が働き損にならない「在職老齢年金制度」の見直しなどを具体的に提案。</p>
+                             </div>
+                        </div>
+                        <div class="policy-card fade-in items-start p-4 border rounded-lg shadow-sm" data-issue="future">
+                             <div class="w-24 text-center font-bold mr-4 shrink-0">共産党・れいわ</div>
+                             <div class="flex-1">
+                                <h4 class="font-bold mb-1">給付水準の維持・向上</h4>
+                                <p class="text-sm text-gray-700">年金の伸びを抑える「マクロ経済スライド」の廃止を共通して主張。財源は富裕層・大企業への課税強化などで確保。</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Parties Section -->
+            <section id="parties" class="content-section fade-in">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-2 text-gray-700">政党を知る</h2>
+                    <p class="mb-6 text-gray-600">今回の選挙で議席を争う、主要な政党の横顔です。</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-blue-700">自由民主党 (自民党)</h3>
+                            <p class="text-sm text-gray-600 mt-1">長年の政権与党。経済成長と日米同盟を軸とする保守政党。安定・漸進的な改革を志向。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-green-700">公明党</h3>
+                            <p class="text-sm text-gray-600 mt-1">自民党と連立を組む中道政党。福祉の充実と生活者目線を重視し、自民党の「ブレーキ役」も。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-sky-700">立憲民主党</h3>
+                            <p class="text-sm text-gray-600 mt-1">野党第一党の中道左派。労働者の権利や社会保障の充実、多様性を重視する。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-orange-600">日本維新の会</h3>
+                            <p class="text-sm text-gray-600 mt-1">大阪が地盤の改革派右派。「小さな政府」を目指し、行政改革や規制緩和を強く主張。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-cyan-600">国民民主党</h3>
+                            <p class="text-sm text-gray-600 mt-1">「手取りを増やす」を掲げる中道政党。政策ごとに与野党と協調する現実路線が特徴。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-red-600">日本共産党</h3>
+                            <p class="text-sm text-gray-600 mt-1">富裕層・大企業への課税強化を訴える左派政党。確固たる組織力を持つ。</p>
+                        </div>
+                         <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-purple-600">れいわ新選組</h3>
+                            <p class="text-sm text-gray-600 mt-1">消費税廃止など積極財政を訴えるポピュリスト左派。障害者権利の擁護も強く訴える。</p>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h3 class="font-bold text-lg text-yellow-600">参政党</h3>
+                            <p class="text-sm text-gray-600 mt-1">反グローバリズム、国粋主義的な主張を展開する右派。食料安全保障や伝統を重視。</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- How to Vote Section -->
+            <section id="how-to-vote" class="content-section fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">あなたの2票、どう使う？投票の基本</h2>
+                    <p class="mb-6 text-gray-600">参院選では2種類の投票用紙に記入します。それぞれの意味を知って、戦略的に投票しましょう。</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex flex-col md:flex-row items-center bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <div class="text-center md:text-left mb-4 md:mb-0 md:mr-6">
+                                <p class="text-lg font-bold text-yellow-800">1票目（薄黄色の紙）</p>
+                                <p class="text-2xl font-bold text-yellow-900">選挙区選挙</p>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold">地域の代表を選ぶ！</h3>
+                                <p class="text-gray-700">あなたの住む都道府県の代表者を選びます。投票用紙には<span class="font-bold text-red-600">「候補者の名前」</span>を書きます。地域の課題を国政に届けてほしい人に投票しましょう。</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="text-center md:text-left mb-4 md:mb-0 md:mr-6">
+                                <p class="text-lg font-bold text-gray-800">2票目（白い紙）</p>
+                                <p class="text-2xl font-bold text-gray-900">比例代表選挙</p>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold">国全体の方向性を決める！</h3>
+                                <p class="text-gray-700">全国を一つの単位として、政党や候補者を選びます。投票用紙には<span class="font-bold text-red-600">「政党名」</span>または<span class="font-bold text-red-600">「候補者の名前」</span>を書きます。個人名で書くと、その候補者の当選を直接応援できます。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-green-50 border-l-4 border-green-500 text-green-800 p-6 rounded-r-lg">
+                        <h3 class="text-xl font-bold mb-2">忙しくても大丈夫！「期日前投票」を活用しよう</h3>
+                        <p class="mb-2">投票日当日に予定がある人は、期日前投票が便利です。</p>
+                        <p><span class="font-bold">期間：</span>7月4日(金)～7月19日(土)</p>
+                        <p><span class="font-bold">場所：</span>市区町村の役所や指定された施設など</p>
+                        <p class="mt-2 text-sm">手ぶらで行っても、本人確認ができれば投票できます。仕事帰りや買い物のついでに、あなたの一票を投じましょう。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center text-gray-500 mt-12 text-sm">
+            <p>&copy; 2025 インタラクティブ参院選ガイド. All rights reserved.</p>
+            <p class="mt-1">このアプリケーションは公開情報に基づき作成されたもので、特定の政党や候補者を支持するものではありません。</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const sections = document.querySelectorAll('.content-section');
+            const issueBtns = document.querySelectorAll('.issue-btn');
+            const policyCards = document.querySelectorAll('.policy-card');
+            const initialMessage = document.getElementById('initial-message');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab');
+
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('tab-inactive');
+
+                    sections.forEach(section => {
+                        if (section.id === target) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            issueBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedIssue = btn.getAttribute('data-issue');
+
+                    issueBtns.forEach(b => b.classList.remove('issue-btn-active'));
+                    btn.classList.add('issue-btn-active');
+                    
+                    if (initialMessage) {
+                        initialMessage.style.display = 'none';
+                    }
+
+                    let visibleCount = 0;
+                    policyCards.forEach(card => {
+                        if (card.getAttribute('data-issue') === selectedIssue) {
+                            card.classList.add('visible');
+                            visibleCount++;
+                        } else {
+                            card.classList.remove('visible');
+                        }
+                    });
+
+                    if (visibleCount === 0 && initialMessage) {
+                        initialMessage.textContent = 'この争点に関する情報は見つかりませんでした。';
+                        initialMessage.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
